@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
     }
 
     dispatch(addTodoList({
-      uuid: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       name,
       createdAt: new Date().toISOString(),
     }))
@@ -24,11 +24,11 @@ const Footer: React.FC = () => {
 
   return (
     <footer
-      className="flex gap-2 h-16 w-full"
+      className="flex justify-center gap-2 h-16 w-full"
     >
       <input
         type="text"
-        className="px-2 py-4 border border-black rounded bg-gray-950 text-xl w-full h-full"
+        className="px-2 py-4 border border-black rounded bg-gray-950 text-xl max-w-[700px] h-full"
         value={name}
         onChange={(e) => setName(e.target.value)}
       />

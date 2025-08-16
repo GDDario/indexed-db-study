@@ -7,7 +7,20 @@ type InitialStateType = {
 };
 
 const initialState: InitialStateType = {
-  todoLists: [],
+  todoLists: [
+    {
+      id: crypto.randomUUID(),
+      name: "First todo list",
+      createdAt: new Date().toISOString(),
+      todos: []
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Second todo list",
+      createdAt: new Date().toISOString(),
+      todos: []
+    },
+  ],
 };
 
 const todoSlice = createSlice({
@@ -17,7 +30,16 @@ const todoSlice = createSlice({
     addTodoList: (state, action) => {
       const todoList: TodoList = action.payload;
 
-      state.todoLists.push(todoList);
+      state.todoLists.push({...todoList, todos: []});
+    },
+    updateTodoListName: (state, action) => {
+      const {id, name} = action.payload;
+
+      const todoListIndex = state.todoLists.findIndex((todoList: TodoList) => todoList.id === id);
+
+      if (todoListIndex !== -1) {
+        state.todoLists[todoListIndex].name = name;
+      }
     },
     removeTodoList: (state, action) => {
       state.todoLists = state.todoLists.filter((todoList: TodoList) => todoList.id !== action.payload.id);
@@ -43,7 +65,7 @@ const todoSlice = createSlice({
   }
 });
 
-export const {addTodoList} = todoSlice.actions;
+export const {addTodoList, updateTodoListName} = todoSlice.actions;
 
 export const selectTodoLists = (state: RootState) => state.todoLists;
 // export const selectTodos = (state: RootState) => state.todos;

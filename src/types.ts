@@ -2,12 +2,12 @@ export type Todo = {
   id: string;
   text: string;
   completed: boolean;
-  createdAt: Date;
+  createdAt: string;
 };
 
 export type TodoList = {
   id: string;
   name: string;
   todos: Todo[];
-  createdAt: Date;
+  createdAt: string;
 };
