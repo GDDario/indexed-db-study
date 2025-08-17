@@ -1,6 +1,6 @@
-import { Todo, TodoList } from "@/types";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "@/store/store";
+import {Todo, TodoList} from "@/types";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {RootState} from "@/store/store";
 import TodoListStore from "@/db/stores/TodoListStore";
 
 type InitialStateType = {
@@ -17,7 +17,7 @@ const initialState: InitialStateType = {
 
 export const loadTodoListsDatabase = createAsyncThunk<TodoList[], void>(
   "todoList/loadFromDatabase",
-  async (_, { rejectWithValue }) => {
+  async (_, {rejectWithValue}) => {
     try {
       const todoLists = await TodoListStore().getAll();
       return todoLists;
@@ -29,9 +29,9 @@ export const loadTodoListsDatabase = createAsyncThunk<TodoList[], void>(
 
 export const addTodoList = createAsyncThunk<TodoList, TodoList>(
   "todoList/addTodoList",
-  async (todoList, { rejectWithValue }) => {
+  async (todoList, {rejectWithValue}) => {
     try {
-      await TodoListStore().add({ ...todoList, todos: [] });
+      await TodoListStore().add({...todoList, todos: []});
       return todoList;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -44,24 +44,27 @@ const todoSlice = createSlice({
   initialState,
   reducers: {
     updateTodoListName: (state, action: { payload: { id: string; name: string } }) => {
-      const { id, name } = action.payload;
+      const {id, name} = action.payload;
       const todoListIndex = state.todoLists.findIndex((todoList: TodoList) => todoList.id === id);
       if (todoListIndex !== -1) {
         state.todoLists[todoListIndex].name = name;
       }
     },
     removeTodoList: (state, action: { payload: { id: string } }) => {
-      state.todoLists = state.todoLists.filter((todoList: TodoList) => todoList.id !== action.payload.id);
+      const id: string = action.payload.id;
+
+      state.todoLists = state.todoLists.filter((todoList: TodoList) => todoList.id !== id);
+      TodoListStore().delete(id);
     },
     addTodo: (state, action: { payload: { todo: Todo; todoListId: string } }) => {
-      const { todo, todoListId } = action.payload;
+      const {todo, todoListId} = action.payload;
       const todoListIndex = state.todoLists.findIndex((todoList: TodoList) => todoList.id === todoListId);
       if (todoListIndex !== -1) {
         state.todoLists[todoListIndex].todos.push(todo);
       }
     },
     removeTodo: (state, action: { payload: { todoId: string; todoListId: string } }) => {
-      const { todoId, todoListId } = action.payload;
+      const {todoId, todoListId} = action.payload;
       const todoListIndex = state.todoLists.findIndex((todoList: TodoList) => todoList.id === todoListId);
       if (todoListIndex !== -1) {
         state.todoLists[todoListIndex].todos = state.todoLists[todoListIndex].todos.filter(
@@ -90,16 +93,16 @@ const todoSlice = createSlice({
       })
       .addCase(addTodoList.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.todoLists.push({ ...action.payload, todos: [] });
+        state.todoLists.push({...action.payload, todos: []});
       })
       .addCase(addTodoList.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      });
+      })
   },
 });
 
-export const { updateTodoListName, removeTodoList, addTodo, removeTodo } = todoSlice.actions;
+export const {updateTodoListName, removeTodoList, addTodo, removeTodo} = todoSlice.actions;
 
 export const selectTodoLists = (state: RootState): TodoList[] => state.todoLists;
 export const selectStatus = (state: RootState): "idle" | "loading" | "succeeded" | "failed" => state.status;

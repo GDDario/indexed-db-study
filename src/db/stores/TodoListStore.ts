@@ -1,6 +1,5 @@
 import {database} from "@/db";
 import {TodoList} from "@/types";
-import Dexie from "dexie";
 
 const todoListStore = () => {
   return {
@@ -16,7 +15,12 @@ const todoListStore = () => {
     },
     add: async (todoList: TodoList) => {
       await database.transaction("rw", database.todoList, async () => {
-        await database.todoList.put({ ...todoList });
+        await database.todoList.put({...todoList});
+      });
+    },
+    delete: async (id: string) => {
+      await database.transaction("rw", database.todoList, async () => {
+        await database.todoList.delete(id);
       });
     },
   };

@@ -6,7 +6,8 @@ import {MdOutlineCancel} from "react-icons/md";
 import {FaRegCircleCheck} from "react-icons/fa6";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/store/store";
-import {updateTodoListName} from "@/store/todoSlice";
+import {removeTodoList, updateTodoListName} from "@/store/todoSlice";
+import {MdOutlineDelete} from "react-icons/md";
 
 type TodoListProps = {
   todoList: TodoListType;
@@ -34,6 +35,10 @@ const TodoList: React.FC<TodoListProps> = ({todoList}: TodoListProps) => {
         (inputRef.current as HTMLInputElement).focus();
       }
     }, 0);
+  }
+
+  const handleDelete = async () => {
+    dispatch(removeTodoList({id: todoList.id}));
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -73,12 +78,20 @@ const TodoList: React.FC<TodoListProps> = ({todoList}: TodoListProps) => {
           :
           <>
             {todoList.name}
-            <CiEdit
-              className="cursor-pointer text-gray-400 hover:text-gray-100"
-              size={16}
-              title="Edit"
-              onClick={handleEdit}
-            />
+            <div className="flex gap-1 items-center">
+              <MdOutlineDelete
+                className="cursor-pointer text-gray-400 hover:text-red-400"
+                size={16}
+                title="Delete"
+                onClick={handleDelete}
+              />
+              <CiEdit
+                className="cursor-pointer text-gray-400 hover:text-gray-100"
+                size={16}
+                title="Edit"
+                onClick={handleEdit}
+              />
+            </div>
           </>
         }
       </div>
