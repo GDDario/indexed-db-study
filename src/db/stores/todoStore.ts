@@ -1,7 +1,9 @@
+import {database} from "@/db";
+
 const todoStore = () => {
   return {
-    getTodos: (todoListId) => {
-      return [];
+    getTodos: () => {
+      return database.todoList.toArray();
     }
   };
 }
