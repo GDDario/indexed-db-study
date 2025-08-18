@@ -2,12 +2,12 @@ import {Todo as TodoType, TodoList as TodoListType} from "@/types";
 import React, {useRef, useState} from "react";
 import Todo from "@/components/Todo";
 import {CiEdit} from "react-icons/ci";
-import {MdOutlineCancel} from "react-icons/md";
+import {MdOutlineCancel, MdOutlineDelete} from "react-icons/md";
 import {FaRegCircleCheck} from "react-icons/fa6";
 import {useDispatch} from "react-redux";
 import {AppDispatch} from "@/store/store";
-import {removeTodoList, updateTodoListName} from "@/store/todoSlice";
-import {MdOutlineDelete} from "react-icons/md";
+import {addTodo, removeTodoList, updateTodoListName} from "@/store/todoSlice";
+import CreatingTodo from "@/components/CreatingTodo";
 
 type TodoListProps = {
   todoList: TodoListType;
@@ -16,6 +16,7 @@ type TodoListProps = {
 const TodoList: React.FC<TodoListProps> = ({todoList}: TodoListProps) => {
   const [name, setName] = useState<string>(todoList.name);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isCreatingTodo, setIsCreatingTodo] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const inputRef = useRef(null);
 
@@ -47,8 +48,18 @@ const TodoList: React.FC<TodoListProps> = ({todoList}: TodoListProps) => {
       return;
     }
 
-    setName((e.currentTarget as HTMLInputElement).value);
   };
+  const handleCreateTodo = (text: string) => {
+    setIsCreatingTodo(false);
+    dispatch(addTodo({
+      todo: {
+        id: crypto.randomUUID(),
+        text,
+        completed: false,
+        createdAt: Date.now().toString(),
+      }, todoListId: todoList.id
+    }));
+  }
 
   return (
     <article className="flex flex-col gap-4 p-4 border-2 border-black rounded bg-gray-900 w-60">
@@ -96,12 +107,28 @@ const TodoList: React.FC<TodoListProps> = ({todoList}: TodoListProps) => {
         }
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-col gap-0.5">
         {
           todoList.todos.map((todo: TodoType) =>
             <Todo key={todo.id} todo={todo}/>
-          )}
+          )
+        }
+        {
+          isCreatingTodo && (
+            <CreatingTodo
+              onCancel={() => setIsCreatingTodo(false)}
+              onCreate={handleCreateTodo}
+            />
+          )
+        }
       </div>
+
+      <button
+        className="mt-2 bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 transition-colors cursor-pointer"
+        onClick={() => setIsCreatingTodo(true)}
+      >
+        Create Todo
+      </button>
     </article>
   );
 };

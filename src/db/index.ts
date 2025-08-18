@@ -1,16 +1,20 @@
 import Dexie, {EntityTable} from "dexie";
-import {TodoList} from "@/types";
+import {Todo, TodoList} from "@/types";
 
 const database = new Dexie('TodoAppDB') as Dexie & {
   todoList: EntityTable<
     TodoList,
     'id'
   >;
+  todo: EntityTable<
+    Todo & { todoListId: string },
+    'id'
+  >;
 };
 
 database.version(1).stores({
   todoList: '++id, name, createdAt',
-  todos: '++id, title, completed',
+  todo: '++id, text, completed, todoListId',
 });
 
 export {database};

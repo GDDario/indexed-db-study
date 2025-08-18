@@ -2,6 +2,7 @@ import {Todo, TodoList} from "@/types";
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {RootState} from "@/store/store";
 import TodoListStore from "@/db/stores/TodoListStore";
+import TodoStore from "@/db/stores/TodoStore";
 
 type InitialStateType = {
   todoLists: TodoList[];
@@ -10,7 +11,27 @@ type InitialStateType = {
 };
 
 const initialState: InitialStateType = {
-  todoLists: [],
+  todoLists: [
+    {
+      id: "1",
+      name: "Default Todo List",
+      createdAt: new Date().toISOString(),
+      todos: [
+        {
+          id: "1",
+          text: "Sample Todo 1",
+          completed: false,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: "2",
+          text: "Sample Todo 2",
+          completed: false,
+          createdAt: new Date().toISOString(),
+        },
+      ]
+    }
+  ],
   status: "loading",
   error: null,
 };
@@ -60,7 +81,9 @@ const todoSlice = createSlice({
       const {todo, todoListId} = action.payload;
       const todoListIndex = state.todoLists.findIndex((todoList: TodoList) => todoList.id === todoListId);
       if (todoListIndex !== -1) {
+        console.log('Todo being added:', todo);
         state.todoLists[todoListIndex].todos.push(todo);
+        TodoStore().add(todo, todoListId);
       }
     },
     removeTodo: (state, action: { payload: { todoId: string; todoListId: string } }) => {
@@ -81,6 +104,7 @@ const todoSlice = createSlice({
       })
       .addCase(loadTodoListsDatabase.fulfilled, (state, action) => {
         state.status = "succeeded";
+        console.log('Todo lists loaded:', action.payload);
         state.todoLists = action.payload;
       })
       .addCase(loadTodoListsDatabase.rejected, (state, action) => {
